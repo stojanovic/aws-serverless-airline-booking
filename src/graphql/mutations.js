@@ -17,6 +17,7 @@ export const createFlight = `mutation CreateFlight($input: CreateFlightInput!) {
     ticketPrice
     ticketCurrency
     flightNumber
+    seatAllocation
   }
 }
 `;
@@ -36,6 +37,7 @@ export const updateFlight = `mutation UpdateFlight($input: UpdateFlightInput!) {
     ticketPrice
     ticketCurrency
     flightNumber
+    seatAllocation
   }
 }
 `;
@@ -55,6 +57,139 @@ export const deleteFlight = `mutation DeleteFlight($input: DeleteFlightInput!) {
     ticketPrice
     ticketCurrency
     flightNumber
+    seatAllocation
+  }
+}
+`;
+export const createBooking = `mutation CreateBooking($input: CreateBookingInput!) {
+  createBooking(input: $input) {
+    id
+    status
+    inboundFlight {
+      id
+      departureDate
+      departureAirportCode
+      departureAirportName
+      departureCity
+      departureLocale
+      arrivalDate
+      arrivalAirportCode
+      arrivalAirportName
+      arrivalCity
+      arrivalLocale
+      ticketPrice
+      ticketCurrency
+      flightNumber
+      seatAllocation
+    }
+    outboundFlight {
+      id
+      departureDate
+      departureAirportCode
+      departureAirportName
+      departureCity
+      departureLocale
+      arrivalDate
+      arrivalAirportCode
+      arrivalAirportName
+      arrivalCity
+      arrivalLocale
+      ticketPrice
+      ticketCurrency
+      flightNumber
+      seatAllocation
+    }
+    paymentToken
+    checkedIn
+    customer
+  }
+}
+`;
+export const updateBooking = `mutation UpdateBooking($input: UpdateBookingInput!) {
+  updateBooking(input: $input) {
+    id
+    status
+    inboundFlight {
+      id
+      departureDate
+      departureAirportCode
+      departureAirportName
+      departureCity
+      departureLocale
+      arrivalDate
+      arrivalAirportCode
+      arrivalAirportName
+      arrivalCity
+      arrivalLocale
+      ticketPrice
+      ticketCurrency
+      flightNumber
+      seatAllocation
+    }
+    outboundFlight {
+      id
+      departureDate
+      departureAirportCode
+      departureAirportName
+      departureCity
+      departureLocale
+      arrivalDate
+      arrivalAirportCode
+      arrivalAirportName
+      arrivalCity
+      arrivalLocale
+      ticketPrice
+      ticketCurrency
+      flightNumber
+      seatAllocation
+    }
+    paymentToken
+    checkedIn
+    customer
+  }
+}
+`;
+export const deleteBooking = `mutation DeleteBooking($input: DeleteBookingInput!) {
+  deleteBooking(input: $input) {
+    id
+    status
+    inboundFlight {
+      id
+      departureDate
+      departureAirportCode
+      departureAirportName
+      departureCity
+      departureLocale
+      arrivalDate
+      arrivalAirportCode
+      arrivalAirportName
+      arrivalCity
+      arrivalLocale
+      ticketPrice
+      ticketCurrency
+      flightNumber
+      seatAllocation
+    }
+    outboundFlight {
+      id
+      departureDate
+      departureAirportCode
+      departureAirportName
+      departureCity
+      departureLocale
+      arrivalDate
+      arrivalAirportCode
+      arrivalAirportName
+      arrivalCity
+      arrivalLocale
+      ticketPrice
+      ticketCurrency
+      flightNumber
+      seatAllocation
+    }
+    paymentToken
+    checkedIn
+    customer
   }
 }
 `;

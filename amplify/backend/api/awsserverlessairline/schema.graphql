@@ -14,4 +14,21 @@ type Flight @model {
     ticketPrice: Int!
     ticketCurrency: String!
     flightNumber: Int!
+    seatAllocation: Int!
+}
+
+type Booking @model {
+    id: ID!
+    status: BookingStatus
+    inboundFlight: Flight @connection 
+    outboundFlight: Flight! @connection
+    paymentToken: String
+    checkedIn: Boolean
+    customer: String!
+}
+
+enum BookingStatus {
+    UNCONFIRMED
+    CONFIRMED
+    CANCELLED
 }
