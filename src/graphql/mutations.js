@@ -1,6 +1,50 @@
 // eslint-disable
 // this is an auto generated file. This will be overwritten
 
+export const processBooking = `mutation ProcessBooking($input: CreateBookingInput!) {
+  processBooking(input: $input) {
+    id
+    status
+    inboundFlight {
+      id
+      departureDate
+      departureAirportCode
+      departureAirportName
+      departureCity
+      departureLocale
+      arrivalDate
+      arrivalAirportCode
+      arrivalAirportName
+      arrivalCity
+      arrivalLocale
+      ticketPrice
+      ticketCurrency
+      flightNumber
+      seatAllocation
+    }
+    outboundFlight {
+      id
+      departureDate
+      departureAirportCode
+      departureAirportName
+      departureCity
+      departureLocale
+      arrivalDate
+      arrivalAirportCode
+      arrivalAirportName
+      arrivalCity
+      arrivalLocale
+      ticketPrice
+      ticketCurrency
+      flightNumber
+      seatAllocation
+    }
+    paymentToken
+    checkedIn
+    customer
+  }
+}
+`;
 export const createFlight = `mutation CreateFlight($input: CreateFlightInput!) {
   createFlight(input: $input) {
     id
