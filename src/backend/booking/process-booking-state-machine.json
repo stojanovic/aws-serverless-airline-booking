@@ -1,0 +1,116 @@
+{
+    "StartAt": "Reserve Flight",
+    "States": {
+        "Reserve Flight": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::dynamodb:updateItem",
+            "Parameters": {
+                "TableName": "Flight-2pa2xn3qzzdi7ntbhdozirkmiy-twitch",
+                "Key": {
+                    "id": {
+                        "S": "fae7c68d-2683-4968-87a2-dfe2a090c2d1"
+                    }
+                },
+                "UpdateExpression": "SET seatAllocation = seatAllocation - :dec",
+                "ExpressionAttributeValues": {
+                    ":dec": {
+                        "N": "1"
+                    },
+                    ":noSeat": {
+                        "N": "0"
+                    }
+                },
+                "ConditionExpression": "seatAllocation > :noSeat"
+            },
+            "TimeoutSeconds": 5,
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "ProvisionedThroughputExceededException",
+                        "RequestLimitExceeded",
+                        "ServiceUnavailable",
+                        "ThrottlingException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "BackoffRate": 2,
+                    "MaxAttempts": 2
+                },
+                {
+                    "ErrorEquals": [
+                        "ConditionalCheckFailedException"
+                    ],
+                    "IntervalSeconds": 0,
+                    "MaxAttempts": 0
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Notify Booking Failed"
+                }
+            ],
+            "Next": "Reserve Booking"
+        },
+        "Reserve Booking": {
+            "Type": "Pass",
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Cancel Booking"
+                }
+            ],
+            "Next": "Verify Payment"
+        },
+        "Release Flight Seat": {
+            "Type": "Pass",
+            "Next": "Notify Booking Failed"
+        },
+        "Verify Payment": {
+            "Type": "Pass",
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Cancel Booking"
+                }
+            ],
+            "Next": "Confirm Booking"
+        },
+        "Cancel Booking": {
+            "Type": "Pass",
+            "Next": "Release Flight Seat"
+        },
+        "Confirm Booking": {
+            "Type": "Pass",
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Cancel Booking"
+                }
+            ],
+            "Next": "Notify Booking Confirmed"
+        },
+        "Notify Booking Failed": {
+            "Type": "Pass",
+            "Next": "Booking Failed"
+        },
+        "Notify Booking Confirmed": {
+            "Type": "Pass",
+            "Next": "Booking Confirmed"
+        },
+        "Booking Failed": {
+            "Type": "Fail"
+        },
+        "Booking Confirmed": {
+            "Type": "Pass",
+            "End": true
+        }
+    }
+}
