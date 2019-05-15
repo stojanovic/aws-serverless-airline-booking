@@ -5,10 +5,10 @@
             "Type": "Task",
             "Resource": "arn:aws:states:::dynamodb:updateItem",
             "Parameters": {
-                "TableName": "Flight-2pa2xn3qzzdi7ntbhdozirkmiy-twitch",
+                "TableName": "$.flightTable",
                 "Key": {
                     "id": {
-                        "S": "fae7c68d-2683-4968-87a2-dfe2a090c2d1"
+                        "S": "$.outboundFlightId"
                     }
                 },
                 "UpdateExpression": "SET seatAllocation = seatAllocation - :dec",
@@ -57,36 +57,33 @@
             "Type": "Task",
             "Resource": "arn:aws:states:::dynamodb:putItem",
             "Parameters": {
-                "TableName": "Booking-2pa2xn3qzzdi7ntbhdozirkmiy-twitch",
+                "TableName": "$.bookingTable",
                 "Item": {
                     "id": {
-                        "S": "593d55b8-7bd1-44ad-bcc0-2436d6793686"
+                        "S": "$.bookingId"
                     },
                     "stateExecutionId": {
-                        "S": "CHANGE_ME"
+                        "S": "$.name"
                     },
                     "__typename": {
                         "S": "Booking"
                     },
                     "bookingOutboundFlightId": {
-                        "S": "CHANGE_ME"
+                        "S": "$.outboundFlightId"
                     },
                     "checkedIn": {
                         "BOOL": "False"
                     },
                     "customer": {
-                        "S": "CHANGE_ME"
+                        "S": "$.customerId"
                     },
                     "paymentToken": {
-                        "S": "CHANGE_ME"
+                        "S": "$.chargeId"
                     },
                     "status": {
                         "S": "UNCONFIRMED"
                     },
                     "createdAt": {
-                        "S": "CHANGE_ME"
-                    },
-                    "updatedAt": {
                         "S": "CHANGE_ME"
                     }
                 }
@@ -119,10 +116,10 @@
             "Type": "Task",
             "Resource": "arn:aws:states:::dynamodb:updateItem",
             "Parameters": {
-                "TableName": "Flight-2pa2xn3qzzdi7ntbhdozirkmiy-twitch",
+                "TableName": "$.flightTable",
                 "Key": {
                     "id": {
-                        "S": "fae7c68d-2683-4968-87a2-dfe2a090c2d1"
+                        "S": "$.outboundFlightId"
                     }
                 },
                 "UpdateExpression": "SET seatAllocation = seatAllocation +:inc",
@@ -172,10 +169,10 @@
             "Type": "Task",
             "Resource": "arn:aws:states:::dynamodb:updateItem",
             "Parameters": {
-                "TableName": "Booking-2pa2xn3qzzdi7ntbhdozirkmiy-twitch",
+                "TableName": "$.bookingTable",
                 "Key": {
                     "id": {
-                        "S": "593d55b8-7bd1-44ad-bcc0-2436d6793686"
+                        "S": "$.bookingId"
                     }
                 },
                 "UpdateExpression": "SET #STATUS = :cancelled",
