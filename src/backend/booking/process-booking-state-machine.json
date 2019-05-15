@@ -116,7 +116,44 @@
             "Next": "Verify Payment"
         },
         "Release Flight Seat": {
-            "Type": "Pass",
+            "Type": "Task",
+            "Resource": "arn:aws:states:::dynamodb:updateItem",
+            "Parameters": {
+                "TableName": "Flight-2pa2xn3qzzdi7ntbhdozirkmiy-twitch",
+                "Key": {
+                    "id": {
+                        "S": "fae7c68d-2683-4968-87a2-dfe2a090c2d1"
+                    }
+                },
+                "UpdateExpression": "SET seatAllocation = seatAllocation +:inc",
+                "ExpressionAttributeValues": {
+                    ":inc": {
+                        "N": "1"
+                    }
+                }
+            },
+            "TimeoutSeconds": 5,
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "ProvisionedThroughputExceededException",
+                        "RequestLimitExceeded",
+                        "ServiceUnavailable",
+                        "ThrottlingException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "BackoffRate": 2,
+                    "MaxAttempts": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Notify Booking Failed"
+                }
+            ],
             "Next": "Notify Booking Failed"
         },
         "Verify Payment": {
