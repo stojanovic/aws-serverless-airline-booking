@@ -5,10 +5,10 @@
             "Type": "Task",
             "Resource": "arn:aws:states:::dynamodb:updateItem",
             "Parameters": {
-                "TableName": "$.flightTable",
+                "TableName.$": "$.flightTable",
                 "Key": {
                     "id": {
-                        "S": "$.outboundFlightId"
+                        "S.$": "$.outboundFlightId"
                     }
                 },
                 "UpdateExpression": "SET seatAllocation = seatAllocation - :dec",
@@ -57,7 +57,7 @@
             "Type": "Task",
             "Resource": "arn:aws:states:::dynamodb:putItem",
             "Parameters": {
-                "TableName": "$.bookingTable",
+                "TableName.$": "$.bookingTable",
                 "Item": {
                     "id": {
                         "S": "$.bookingId"
@@ -84,7 +84,7 @@
                         "S": "UNCONFIRMED"
                     },
                     "createdAt": {
-                        "S": "CHANGE_ME"
+                        "S": "$.createdAt"
                     }
                 }
             },
@@ -110,13 +110,13 @@
                     "Next": "Cancel Booking"
                 }
             ],
-            "Next": "Verify Payment"
+            "Next": "Collect Payment"
         },
         "Release Flight Seat": {
             "Type": "Task",
             "Resource": "arn:aws:states:::dynamodb:updateItem",
             "Parameters": {
-                "TableName": "$.flightTable",
+                "TableName.$": "$.flightTable",
                 "Key": {
                     "id": {
                         "S": "$.outboundFlightId"
@@ -153,23 +153,15 @@
             ],
             "Next": "Notify Booking Failed"
         },
-        "Verify Payment": {
+        "Collect Payment": {
             "Type": "Pass",
-            "Catch": [
-                {
-                    "ErrorEquals": [
-                        "States.ALL"
-                    ],
-                    "Next": "Cancel Booking"
-                }
-            ],
             "Next": "Confirm Booking"
         },
         "Cancel Booking": {
             "Type": "Task",
             "Resource": "arn:aws:states:::dynamodb:updateItem",
             "Parameters": {
-                "TableName": "$.bookingTable",
+                "TableName.$": "$.bookingTable",
                 "Key": {
                     "id": {
                         "S": "$.bookingId"
@@ -203,14 +195,6 @@
         },
         "Confirm Booking": {
             "Type": "Pass",
-            "Catch": [
-                {
-                    "ErrorEquals": [
-                        "States.ALL"
-                    ],
-                    "Next": "Cancel Booking"
-                }
-            ],
             "Next": "Notify Booking Confirmed"
         },
         "Notify Booking Failed": {
