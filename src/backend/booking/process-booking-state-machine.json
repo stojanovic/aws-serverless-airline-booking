@@ -210,10 +210,15 @@
                     "ErrorEquals": [
                         "States.ALL"
                     ],
-                    "Next": "Cancel Booking"
+                    "Next": "Refund Payment"
                 }
             ],
             "Next": "Notify Booking Confirmed"
+        },
+        "Refund Payment": {
+            "Type": "Task",
+            "Resource": "${RefundPayment.Arn}",
+            "Next": "Cancel Booking"
         },
         "Notify Booking Failed": {
             "Type": "Pass",
