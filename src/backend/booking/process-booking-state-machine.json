@@ -203,7 +203,16 @@
             "Next": "Release Flight Seat"
         },
         "Confirm Booking": {
-            "Type": "Pass",
+            "Type": "Task",
+            "Resource": "${ConfirmBooking.Arn}",
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "Cancel Booking"
+                }
+            ],
             "Next": "Notify Booking Confirmed"
         },
         "Notify Booking Failed": {
