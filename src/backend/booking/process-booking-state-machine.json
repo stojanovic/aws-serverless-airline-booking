@@ -48,9 +48,11 @@
                     "ErrorEquals": [
                         "States.ALL"
                     ],
+                    "ResultPath": "$.flightError",
                     "Next": "Notify Booking Failed"
                 }
             ],
+            "ResultPath": null,
             "Next": "Reserve Booking"
         },
         "Reserve Booking": {
@@ -60,31 +62,31 @@
                 "TableName.$": "$.bookingTable",
                 "Item": {
                     "id": {
-                        "S": "$.bookingId"
+                        "S.$": "$.bookingId"
                     },
                     "stateExecutionId": {
-                        "S": "$.name"
+                        "S.$": "$$.Execution.Id"
                     },
                     "__typename": {
                         "S": "Booking"
                     },
                     "bookingOutboundFlightId": {
-                        "S": "$.outboundFlightId"
+                        "S.$": "$.outboundFlightId"
                     },
                     "checkedIn": {
                         "BOOL": "False"
                     },
                     "customer": {
-                        "S": "$.customerId"
+                        "S.$": "$.customerId"
                     },
                     "paymentToken": {
-                        "S": "$.chargeId"
+                        "S.$": "$.chargeId"
                     },
                     "status": {
                         "S": "UNCONFIRMED"
                     },
                     "createdAt": {
-                        "S": "$.createdAt"
+                        "S.$": "$.createdAt"
                     }
                 }
             },
@@ -107,9 +109,11 @@
                     "ErrorEquals": [
                         "States.ALL"
                     ],
+                    "ResultPath": "$.bookingError",
                     "Next": "Cancel Booking"
                 }
             ],
+            "ResultPath": null,
             "Next": "Collect Payment"
         },
         "Release Flight Seat": {
@@ -119,7 +123,7 @@
                 "TableName.$": "$.flightTable",
                 "Key": {
                     "id": {
-                        "S": "$.outboundFlightId"
+                        "S.$": "$.outboundFlightId"
                     }
                 },
                 "UpdateExpression": "SET seatAllocation = seatAllocation +:inc",
@@ -148,6 +152,7 @@
                     "ErrorEquals": [
                         "States.ALL"
                     ],
+                    "ResultPath": "$.flightError",
                     "Next": "Notify Booking Failed"
                 }
             ],
@@ -159,11 +164,20 @@
             "Catch": [
                 {
                     "ErrorEquals": [
+                        "PaymentException"
+                    ],
+                    "ResultPath": "$.paymentError",
+                    "Next": "Cancel Booking"
+                },
+                {
+                    "ErrorEquals": [
                         "States.ALL"
                     ],
+                    "ResultPath": "$.paymentError",
                     "Next": "Cancel Booking"
                 }
             ],
+            "ResultPath": null,
             "Next": "Confirm Booking"
         },
         "Cancel Booking": {
@@ -173,7 +187,7 @@
                 "TableName.$": "$.bookingTable",
                 "Key": {
                     "id": {
-                        "S": "$.bookingId"
+                        "S.$": "$.bookingId"
                     }
                 },
                 "UpdateExpression": "SET #STATUS = :cancelled",
@@ -210,6 +224,7 @@
                     "ErrorEquals": [
                         "States.ALL"
                     ],
+                    "ResultPath": "$.bookingError",
                     "Next": "Refund Payment"
                 }
             ],
@@ -218,18 +233,19 @@
         "Refund Payment": {
             "Type": "Task",
             "Resource": "${RefundPayment.Arn}",
+            "ResultPath": null,
             "Next": "Cancel Booking"
         },
         "Notify Booking Failed": {
             "Type": "Pass",
             "Next": "Booking Failed"
         },
+        "Booking Failed": {
+            "Type": "Fail"
+        },
         "Notify Booking Confirmed": {
             "Type": "Pass",
             "Next": "Booking Confirmed"
-        },
-        "Booking Failed": {
-            "Type": "Fail"
         },
         "Booking Confirmed": {
             "Type": "Pass",
