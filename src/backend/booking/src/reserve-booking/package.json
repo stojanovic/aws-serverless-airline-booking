@@ -1,0 +1,23 @@
+{
+  "name": "reserve-booking",
+  "version": "1.0.0",
+  "description": "Create booking as unconfirmed",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aws-samples/aws-serverless-airline-booking.git"
+  },
+  "author": "Heitor Lessa",
+  "license": "https://github.com/aws-samples/aws-serverless-airline-booking/blob/develop/LICENSE",
+  "bugs": {
+    "url": "https://github.com/aws-samples/aws-serverless-airline-booking/issues"
+  },
+  "homepage": "https://github.com/aws-samples/aws-serverless-airline-booking#readme",
+  "dependencies": {
+    "aws-sdk": "^2.458.0"
+  },
+  "devDependencies": {}
+}
