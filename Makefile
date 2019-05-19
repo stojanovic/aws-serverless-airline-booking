@@ -14,38 +14,47 @@ target:
 
 all: init install build
 
-install:
-	@$(MAKE) _install_packages
+install: ##=> Install all packages specified in Pipfile.lock
+	$(info [*] Install required packages...)
+	@$(PIPENV) sync
+
+init: ##=> Install OS deps, python3.6 and dev tools
+	$(info [*] Bootstrapping CI system...)
+	@$(MAKE) _install_os_packages
 	@$(MAKE) _install_dev_packages
 
-init:
-	yum install jq python36 python36-devel python36-pip -y
-	python36 -m pip install --upgrade pip
-	python36 -m pip install pipenv
-
-package: ##=> Package local artifacts to S3
-	@echo "[+] Packaging artifacts..."
-
 build: ##=> Builds local artifacts using SAM CLI
-	@echo "[+] Building artifacts..."
+	$(info [*] Building dependencies and artifacts...)
 
 test: ##=> Run pytest
-	@echo "[+] Run unit/functional tests for services...."
+	$(info [*] Running tests...)
 
 deploy: ##=> Deploy services
-	@echo "[+] Deploying services...."
+	$(info [*] Deploying...)
+
+lint: ##=> Run code and infrastructure linters
+	$(info [*] Running CloudFormation/SAM linter...)
+	$(info [*] Running Code linter...)
+
+ci: ##=> CI tasks before deploying
+	$(MAKE) lint
+	$(MAKE) build
+	$(MAKE) test
 
 #############
 #  Helpers  #
 #############
 
-_install_packages:
-	$(info [*] Install required packages...)
-	@$(PIPENV) install
-
 _install_dev_packages:
-	$(info [*] Install required dev-packages...)
-	@$(PIPENV) install -d
+	$(info [*] Installing development packages...)
+	@$(PIPENV) sync --dev
+
+_install_os_packages:
+	$(info [*] Installing Python and OS deps...)
+	yum install jq python36 python36-devel python36-pip gcc glibc-headers -y
+	$(info [*] Upgrading Python PIP and installing Pipenv...)
+	python36 -m pip install --upgrade pip
+	python36 -m pip install pipenv
 
 define HELP_MESSAGE
 	Common usage:
@@ -53,12 +62,9 @@ define HELP_MESSAGE
 	...::: Bootstraps environment with necessary tools like SAM and Pipenv :::...
 	$ make init
 
-	...::: Installs all required packages as defined in the pipfile :::...
+	...::: Installs all required packages as per Pipfile.lock definition :::...
 	$ make install
 
-	...::: Build local artifacts using Docker :::...
+	...::: Build local artifacts using SAM CLI :::...
 	$ make build
-
-	...::: Run Pytest under tests/ with pipenv :::...
-	$ make test
 endef
