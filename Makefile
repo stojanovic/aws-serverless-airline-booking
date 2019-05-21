@@ -43,7 +43,8 @@ ci: ##=> CI tasks before deploying
 
 deploy.booking: ##=> Deploy booking service using SAM
 	$(info [*] Packaging and deploying Booking service...)
-	cd src/backend/booking && \
+	pipenv shell && \
+		cd src/backend/booking && \
 		pipenv run sam package --s3-bucket $${DEPLOYMENT_BUCKET_NAME} --region $${AWS_REGION} && \
 		pipenv run sam deploy \
 			--template-file packaged.yaml \
