@@ -18,7 +18,10 @@ deploy: ##=> Deploy services
 deploy.booking: ##=> Deploy booking service using SAM
 	$(info [*] Packaging and deploying Booking service...)
 	cd src/backend/booking && \
-		sam package --s3-bucket $${DEPLOYMENT_BUCKET_NAME} --region $${AWS_REGION} && \
+		sam package \
+			--s3-bucket $${DEPLOYMENT_BUCKET_NAME} \
+			--region $${AWS_REGION} \
+			--output-template-file packaged.yaml && \
 		sam deploy \
 			--template-file packaged.yaml \
 			--stack-name $${STACK_NAME}-booking-$${AWS_BRANCH} \
