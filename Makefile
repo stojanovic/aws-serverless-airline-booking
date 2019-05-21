@@ -41,6 +41,18 @@ ci: ##=> CI tasks before deploying
 	$(MAKE) build
 	$(MAKE) test
 
+deploy.booking: ##=> Deploy booking service using SAM
+	$(info [*] Packaging and deploying Booking service...)
+	cd src/backend/booking && \
+		pipenv run sam package --s3-bucket $${DEPLOYMENT_BUCKET_NAME} --region $${AWS_REGION} && \
+		pipenv run sam deploy \
+			--template-file packaged.yaml \
+			--stack-name $${STACK_NAME}-booking-$${AWS_BRANCH} \
+			--capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
+			--parameter-overrides BookingTable=$${BOOKING_TABLE_NAME} FlightTable=$${FLIGHT_TABLE_NAME} \
+			--region $${AWS_REGION}
+
+
 #############
 #  Helpers  #
 #############
