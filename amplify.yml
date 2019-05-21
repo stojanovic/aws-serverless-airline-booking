@@ -25,7 +25,7 @@ backend:
         ##
         # Deploy SAM based back-end
         ##
-        - make deploy.booking
+        - make deploy
 frontend:
   phases:
     preBuild:
