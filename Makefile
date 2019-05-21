@@ -49,5 +49,5 @@ define HELP_MESSAGE
 	$ make init
 
 	...::: Deploy all SAM based services :::...
-	$ make build
+	$ make deploy
 endef
