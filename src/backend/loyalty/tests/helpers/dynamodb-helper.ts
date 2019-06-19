@@ -1,4 +1,5 @@
 import DynamoDB, { DocumentClient } from 'aws-sdk/clients/dynamodb';
+import { PutInput } from '../../src/ingest/lib/document_client';
 
 export async function dbSetup(accessKeyId: string, secretAccessKey: string, sessionToken: string): Promise<DynamoDB> {
   return new DynamoDB({
@@ -59,4 +60,12 @@ export async function deleteTable(tableName: string, dynamoDb: DynamoDB): Promis
   return dynamoDb.waitFor('tableNotExists', {
     TableName: tableName
   }).promise()
+}
+
+export async function insertData(tableName: string, data: Object, docClient: DocumentClient): Promise<Object> {
+  const params: PutInput = {
+    TableName: tableName,
+    Item: data
+  }
+  return await docClient.put(params).promise();
 }
