@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "Loyalty service to collection airmiles",
   "dependencies": {
-    "aws-sdk": "^2.464.0",
-    "uuid": "^3.3.2"
+    "aws-sdk": "^2.464.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.27",
@@ -17,6 +16,7 @@
     "ts-loader": "^6.0.2",
     "tslint": "^5.17.0",
     "typescript": "^3.5.2",
+    "uuid": "^3.3.2",
     "webpack": "^4.33.0",
     "webpack-cli": "^3.3.3"
   },
