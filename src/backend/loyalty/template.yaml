@@ -5,7 +5,7 @@ Description: >
   
 Globals:
   Function:
-    Timeout: 100
+    Timeout: 5
 
 Parameters:
   Stage:
@@ -66,6 +66,9 @@ Resources:
           Type: SNS
           Properties:
             Topic: !Ref BookingSNSTopic
+            FilterPolicy:
+              Booking.Status:
+                - confirmed
 
   GetFunc:
     Type: AWS::Serverless::Function
