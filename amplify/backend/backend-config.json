@@ -1,8 +1,10 @@
 {
 	"auth": {
-		"cognitoa7d29d9d": {
+		"awsserverlessairline44ea6421": {
 			"service": "Cognito",
-			"providerPlugin": "awscloudformation"
+			"providerPlugin": "awscloudformation",
+			"dependsOn": [],
+			"customAuth": false
 		}
 	},
 	"api": {
@@ -10,7 +12,15 @@
 			"service": "AppSync",
 			"providerPlugin": "awscloudformation",
 			"output": {
-				"securityType": "AMAZON_COGNITO_USER_POOLS"
+				"authConfig": {
+					"additionalAuthenticationProviders": [],
+					"defaultAuthentication": {
+						"authenticationType": "AMAZON_COGNITO_USER_POOLS",
+						"userPoolConfig": {
+							"userPoolId": "authawsserverlessairline44ea6421"
+						}
+					}
+				}
 			}
 		}
 	}

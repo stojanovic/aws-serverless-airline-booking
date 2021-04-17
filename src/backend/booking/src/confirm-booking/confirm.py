@@ -1,19 +1,31 @@
-import json
 import os
 import secrets
 
 import boto3
+from aws_lambda_powertools import Logger, Metrics, Tracer
+from aws_lambda_powertools.metrics import MetricUnit
 from botocore.exceptions import ClientError
+
+from process_booking import process_booking_handler
+
+logger = Logger()
+tracer = Tracer()
+metrics = Metrics()
+
 
 session = boto3.Session()
 dynamodb = session.resource("dynamodb")
-table = dynamodb.Table(os.environ["BOOKING_TABLE_NAME"])
+table_name = os.getenv("BOOKING_TABLE_NAME", "undefined")
+table = dynamodb.Table(table_name)
 
 
 class BookingConfirmationException(Exception):
-    pass
+    def __init__(self, message=None, details=None):
+        self.message = message or "Booking confirmation failed"
+        self.details = details or {}
 
 
+@tracer.capture_method
 def confirm_booking(booking_id):
     """Update existing booking to CONFIRMED and generates a Booking reference
 
@@ -34,7 +46,13 @@ def confirm_booking(booking_id):
     """
     try:
         reference = secrets.token_urlsafe(4)
-        table.update_item(
+        logger.debug(
+            {
+                "operation": "booking_confirmation",
+                "details": {"booking_id": booking_id, "booking_reference": reference},
+            }
+        )
+        ret = table.update_item(
             Key={"id": booking_id},
             ConditionExpression="id = :idVal",
             UpdateExpression="SET bookingReference = :br, #STATUS = :confirmed",
@@ -44,15 +62,20 @@ def confirm_booking(booking_id):
                 ":idVal": booking_id,
                 ":confirmed": "CONFIRMED",
             },
+            ReturnValues="UPDATED_NEW",
         )
 
-        return {
-            "bookingReference": reference
-        }
-    except ClientError as e:
-        raise BookingConfirmationException(e.response["Error"]["Message"])
+        logger.info({"operation": "booking_confirmation", "details": ret})
+        tracer.put_metadata(booking_id, ret)
+
+        return {"bookingReference": reference}
+    except ClientError as err:
+        logger.exception({"operation": "booking_confirmation"})
+        raise BookingConfirmationException(details=err)
 
 
+@metrics.log_metrics(capture_cold_start_metric=True)
+@process_booking_handler(logger=logger)
 def lambda_handler(event, context):
     """AWS Lambda Function entrypoint to confirm booking
 
@@ -78,14 +101,24 @@ def lambda_handler(event, context):
     BookingConfirmationException
         Booking Confirmation Exception including error message upon failure
     """
-
-    if "bookingId" not in event:
+    booking_id = event.get("bookingId")
+    if not booking_id:
+        metrics.add_metric(name="InvalidConfirmationRequest", unit=MetricUnit.Count, value=1)
+        logger.error({"operation": "input_validation", "details": event})
         raise ValueError("Invalid booking ID")
 
     try:
-        ret = confirm_booking(event["bookingId"])
-    except BookingConfirmationException as e:
-        raise BookingConfirmationException(e)
+        logger.debug(f"Confirming booking - {booking_id}")
+        ret = confirm_booking(booking_id)
 
-    # Step Functions use the return to append `bookingReference` key into the overall output
-    return ret['bookingReference']
+        metrics.add_metric(name="SuccessfulBooking", unit=MetricUnit.Count, value=1)
+        tracer.put_annotation("BookingReference", ret["bookingReference"])
+        tracer.put_annotation("BookingStatus", "CONFIRMED")
+
+        # Step Functions use the return to append `bookingReference` key into the overall output
+        return ret["bookingReference"]
+    except BookingConfirmationException as err:
+        metrics.add_metric(name="FailedBooking", unit=MetricUnit.Count, value=1)
+        tracer.put_annotation("BookingStatus", "ERROR")
+        logger.exception({"operation": "booking_confirmation"})
+        raise
